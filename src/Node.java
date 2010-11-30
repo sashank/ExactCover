@@ -1,13 +1,28 @@
-public abstract class Node {
-	private Node left, right, up, down;
+
+public class Node {
+	public int size;
+	private final String name;
+	private Node columnHeader;
+	public Node left, right, up, down;
 	
-	public Node getLeft()  { return left;  }
-	public Node getRight() { return right; }
-	public Node getUp()    { return up;    }
-	public Node getDown()  { return down;  }
+	private static final Node root = new Node("Root", -1, null);
 	
-	public void setLeft(Node n)  { left = n;  }
-	public void setRight(Node n) { right = n; }
-	public void setUp(Node n)    { up = n;    }
-	public void setDown(Node n)  { down = n;  }
+	public Node(String name, int size, Node columnHeader) {
+		this.size = size;
+		this.name = name;
+		this.columnHeader = columnHeader;
+		
+		left  = this;
+		right = this;
+		up    = this;
+		down  = this;
+	}
+	
+	public static Node getRoot() {
+		return root;
+	}
+	
+	public String getName()  { return name; }
+	public Node getColumnHeader() { return columnHeader; }
+	public String toString() { return name + ":" + size; }
 }
