@@ -5,8 +5,6 @@ public class Node {
 	private Node columnHeader;
 	public Node left, right, up, down;
 	
-	private static final Node root = new Node("Root", -1, null);
-	
 	public Node(String name, int size, Node columnHeader) {
 		this.size = size;
 		this.name = name;
@@ -16,10 +14,6 @@ public class Node {
 		right = this;
 		up    = this;
 		down  = this;
-	}
-	
-	public static Node getRoot() {
-		return root;
 	}
 	
 	public String getName()  { return name; }

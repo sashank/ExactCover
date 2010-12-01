@@ -1,91 +1,158 @@
-import java.util.Map;
+
 
 public class ExactCover {
-	private static Node root;
-	private static Map<Integer, Node>  path;
 
 	public static void main(String[] args) {
-
+		DLX dlx = new DLX(test1());
+		dlx.findSolution();
 	}
 
-	public static void search(int k) {
-		if(root.right == root) {
-			printSolution(k);
-			return;
-		}
-		
-		Node c = chooseColumn();
-		coverColumn(c);
-		Node d = c.down;
-		while(d != c) {
-			path.put(k, d);
-			Node r = d.right;
-			while(r != d) {
-				coverColumn(r);
-				r = r.right;
-			}
-			search(k+1);
-			d = path.get(k);
-			c = d.getColumnHeader();
-			Node l = d.left;
-			while(l != d) {
-				uncoverColumn(l);
-				l = l.left;
-			}
-			d = d.down;
-		}
-		uncoverColumn(c);
-	}
+	public static Node test1() {
+		Node root = new Node("Root", -1, null);
 
-	public static void coverColumn(Node n) {
-		n.right.left = n.left;
-		n.left.right = n.right;
+		Node a = new Node("A", 2, null);
+		Node b = new Node("B", 2, null);
+		Node c = new Node("C", 2, null);
+		Node d = new Node("D", 3, null);
+		Node e = new Node("E", 2, null);
+		Node f = new Node("F", 2, null);
+		Node g = new Node("G", 3, null);
 
-		Node d = n.down;
-		while(d != n) {
-			Node r = d.right;
-			while(r != d) {
-				r.up.down = r.down;
-				r.down.up = r.up;
-				r.getColumnHeader().size--;
-				r = r.right;
-			}
-			d = d.down;
-		}
-	}
-	
-	public static void uncoverColumn(Node n) {
-		Node u = n.up;
-		
-		while(u != n) {
-			Node l = u.left;
-			while(l != u) {
-				l.getColumnHeader().size++;
-				l.up.down = l;
-				l.down.up = l;
-			}
-		}
-		n.left.right = n;
-		n.right.left = n;
-	}
+		Node a1 = new Node("A1", -1, a);
+		Node a2 = new Node("A2", -1, a);
+		Node b1 = new Node("B1", -1, b);
+		Node b2 = new Node("B2", -1, b);
+		Node c1 = new Node("C1", -1, c);
+		Node c2 = new Node("C2", -1, c);
+		Node d1 = new Node("D1", -1, d);
+		Node d2 = new Node("D2", -1, d);
+		Node d3 = new Node("D3", -1, d);
+		Node e1 = new Node("E1", -1, e);
+		Node e2 = new Node("E2", -1, e);
+		Node f1 = new Node("F1", -1, f);
+		Node f2 = new Node("F2", -1, f);
+		Node g1 = new Node("G1", -1, g);
+		Node g2 = new Node("G2", -1, g);
+		Node g3 = new Node("G3", -1, g);
 
-	public static Node chooseColumn() {
-		int currSize   = Integer.MAX_VALUE;
-		Node ret = null;
+		root.right = a;
+		root.left = g;
 
-		Node currNode = root.right;
-		while(root != currNode) {
-			if(currNode.size < currSize) 
-				ret = currNode;
-			currNode = currNode.right;
-		}
+		a.up = a2;
+		a.down = a1;
+		a.left = root;
+		a.right = b;
 
-		return ret;
-	}
+		b.up = b2;
+		b.down = b1;
+		b.left = a;
+		b.right = c;
 
-	public static void printSolution(int k) {
-		System.out.println("Solution:: ");
-		for(int i = 0; i < k; i++)
-			System.out.println(path.get(k));
+		c.up = c2;
+		c.down = c1;
+		c.left = b;
+		c.right = d;
+
+		d.up = d3;
+		d.down = d1;
+		d.left = c;
+		d.right = e;
+
+		e.up = e2;
+		e.down = e1;
+		e.left = d;
+		e.right = f;
+
+		f.up = f2;
+		f.down = f1;
+		f.left = e;
+		f.right = g;
+
+		g.up = g3;
+		g.down = g1;
+		g.left = f;
+		g.right = root;
+
+		a1.up = a;
+		a1.down = a2;
+		a1.left = g1;
+		a1.right = d1;
+
+		a2.up = a1;
+		a2.down = a;
+		a2.left = d2;
+		a2.right = d2;
+
+		b1.up = b;
+		b1.down = b2;
+		b1.left = f2;
+		b1.right = c2;
+
+		b2.up = b1;
+		b2.down = b;
+		b2.left = g2;
+		b2.right = g2;
+
+		c1.up = c;
+		c1.down = c2;
+		c1.left = f1;
+		c1.right = e1;
+
+		c2.up = c1;
+		c2.down = c;
+		c2.left = b1;
+		c2.right = f2;
+
+		d1.up = d;
+		d1.down = d2;
+		d1.left = a1;
+		d1.right = g1;
+
+		d2.up = d1;
+		d2.down = d3;
+		d2.left = a2;
+		d2.right = a2;
+
+		d3.up = d2;
+		d3.down = d;
+		d3.left = g3;
+		d3.right = e2;
+
+		e1.up = e;
+		e1.down = e2;
+		e1.left = c1;
+		e1.right = f1;
+
+		e2.up = e1;
+		e2.down = e;
+		e2.left = d3;
+		e2.right = g3;
+
+		f1.up = f;
+		f1.down = f2;
+		f1.left = e1;
+		f1.right = c1;
+
+		f2.up = f1;
+		f2.down = f;
+		f2.left = c1;
+		f2.right = b2;
+
+		g1.up = g;
+		g1.down = g2;
+		g1.left = d1;
+		g1.right = a1;
+
+		g2.up = g1;
+		g2.down = g3;
+		g2.left = b2;
+		g2.right = b2;
+
+		g3.up = g2;
+		g3.down = g;
+		g3.left = e2;
+		g3.right = d3;
+
+		return root;
 	}
 }
