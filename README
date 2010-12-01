@@ -1,0 +1,3 @@
+This project is a Java implementation of Knuth's Algorithm X using Dancing Links (commonly called DLX).
+It is used to solve exact cover problems, such as N-Queens and Sudoku.
+For reference: http://www-cs-faculty.stanford.edu/~uno/papers/dancing-color.ps.gz
