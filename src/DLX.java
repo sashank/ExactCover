@@ -22,6 +22,7 @@ public class DLX {
 		}
 		
 		Node c = chooseColumn();
+		System.out.println("Level: " + k + ", Covering: " + c);
 		coverColumn(c);
 		Node d = c.down;
 		while(d != c) {
@@ -41,6 +42,7 @@ public class DLX {
 			}
 			d = d.down;
 		}
+		System.out.println("Level: " + k + ", Uncovering: " + c);
 		uncoverColumn(c);
 	}
 
@@ -72,20 +74,24 @@ public class DLX {
 				l.getColumnHeader().size++;
 				l.up.down = l;
 				l.down.up = l;
+				l = l.left;
 			}
+			u = u.up;
 		}
 		n.left.right = n;
 		n.right.left = n;
 	}
 
 	private Node chooseColumn() {
-		int currSize   = Integer.MAX_VALUE;
-		Node ret = null;
+		int currSize = Integer.MAX_VALUE;
+		Node ret     = null;
 
 		Node currNode = root.right;
-		while(root != currNode) {
-			if(currNode.size < currSize) 
+		while(currNode != root) {
+			if(currNode.size < currSize) {
+				currSize = currNode.size;
 				ret = currNode;
+			}
 			currNode = currNode.right;
 		}
 
