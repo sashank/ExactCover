@@ -28,7 +28,7 @@ public class DLX {
 			path.put(k, d);
 			Node r = d.right;
 			while(r != d) {
-				coverColumn(r);
+				coverColumn(r.getColumnHeader());
 				r = r.right;
 			}
 			search(k+1);
@@ -45,6 +45,7 @@ public class DLX {
 	}
 
 	private void coverColumn(Node n) {
+		assert(n.getColumnHeader() == null);
 		n.right.left = n.left;
 		n.left.right = n.right;
 
@@ -62,6 +63,7 @@ public class DLX {
 	}
 	
 	private void uncoverColumn(Node n) {
+		assert(n.getColumnHeader() == null);
 		Node u = n.up;
 		
 		while(u != n) {
