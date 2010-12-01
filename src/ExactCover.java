@@ -135,8 +135,8 @@ public class ExactCover {
 
 		f2.up = f1;
 		f2.down = f;
-		f2.left = c1;
-		f2.right = b2;
+		f2.left = c2;
+		f2.right = b1;
 
 		g1.up = g;
 		g1.down = g2;

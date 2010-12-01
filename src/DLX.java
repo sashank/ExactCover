@@ -13,6 +13,7 @@ public class DLX {
 	
 	public void findSolution() {
 		search(0);
+		System.out.println("Ending search");
 	}
 	
 	private void search(int k) {
@@ -22,7 +23,6 @@ public class DLX {
 		}
 		
 		Node c = chooseColumn();
-		System.out.println("Level: " + k + ", Covering: " + c);
 		coverColumn(c);
 		Node d = c.down;
 		while(d != c) {
@@ -37,12 +37,11 @@ public class DLX {
 			c = d.getColumnHeader();
 			Node l = d.left;
 			while(l != d) {
-				uncoverColumn(l);
+				uncoverColumn(l.getColumnHeader());
 				l = l.left;
 			}
 			d = d.down;
 		}
-		System.out.println("Level: " + k + ", Uncovering: " + c);
 		uncoverColumn(c);
 	}
 
@@ -101,6 +100,6 @@ public class DLX {
 	private void printSolution(int k) {
 		System.out.println("Solution:: ");
 		for(int i = 0; i < k; i++)
-			System.out.println(path.get(k));
+			System.out.println(path.get(i).getColumnHeader());
 	}
 }
