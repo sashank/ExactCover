@@ -1,5 +1,6 @@
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 
 public class DLX {
@@ -9,6 +10,17 @@ public class DLX {
 	public DLX(Node root) {
 		this.root = root;
 		path = new HashMap<Integer, Node>();
+	}
+	
+	public void solveSudoku(Set<String> initial) {
+		Node r = root.right;
+		while(r != root) {
+			if(initial.contains(r.getName())) {
+				coverColumn(r);
+			}
+			r = r.right;
+		}
+		findSolution();
 	}
 	
 	public void findSolution() {
@@ -23,6 +35,7 @@ public class DLX {
 		}
 		
 		Node c = chooseColumn();
+		System.out.println("Covering: " + c);
 		coverColumn(c);
 		Node d = c.down;
 		while(d != c) {
