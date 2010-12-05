@@ -45,7 +45,7 @@ public class DLXSolver {
 		uncoverColumn(c);
 	}
 
-	private void coverColumn(Node n) {
+	protected void coverColumn(Node n) {
 		assert(n.getColumnHeader() == null);
 		n.right.left = n.left;
 		n.left.right = n.right;
@@ -91,7 +91,7 @@ public class DLXSolver {
 		return ret;
 	}
 
-	private void printSolution(int k) {
+	protected void printSolution(int k) {
 		System.out.println("Solution:: ");
 		for(int i = 0; i < k; i++)
 			System.out.println(path.get(i).getColumnHeader());
