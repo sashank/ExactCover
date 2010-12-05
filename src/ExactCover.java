@@ -1,7 +1,4 @@
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.HashSet;
-import java.util.Scanner;
 import java.util.Set;
 
 
@@ -11,7 +8,7 @@ public class ExactCover {
 	public static void main(String[] args) {
 		//DLX dlx = new DLX(test1());
 		//dlx.findSolution();
-		DLX dlx2 = new DLX(createSudokuMatrix());
+		
 		Set<String> initial = new HashSet<String>();
 		initial.add("r1c2#7");
 		initial.add("r1c3#5");
@@ -53,91 +50,8 @@ public class ExactCover {
 		initial.add("r9c5#1");
 		initial.add("r9c7#3");
 		initial.add("r9c8#9");
-		dlx2.solveSudoku(initial);
-	}
-	
-	public static Node createSudokuMatrix() {
-		Node[][] nodeSmatrix = new Node[730][325];
-		
-		Scanner sc = null;
-		try {
-			sc = new Scanner(new File("sudoku_matrix"));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		
-		// initialize root
-		nodeSmatrix[0][0] = new Node("root", -1, null);
-		
-		// initialize header nodes in nodeSmatrix
-		int hrow = 1;
-		for(int r = 1; r <= 9; ++r) {
-			for(int c = 1; c <= 9; ++c) {
-				for(int n = 1; n <= 9; ++n) {
-					nodeSmatrix[hrow][0] = new Node("r" + r + "c" + c + "#" + n, 4, null);
-					++hrow;
-				}
-			}
-		}
-		
-		// initialize data nodes in nodeSmatrix from file
-		int row = 1;
-		while(sc.hasNext()) {
-			String line = sc.nextLine();
-			if(line.startsWith("#"))
-				continue;
-			
-			int col = 1;
-			for(char c : line.toCharArray()) {
-				if(c == '1') {
-					nodeSmatrix[row][col] = new Node("$" + row + "_" + col, -1, nodeSmatrix[row][0]);
-					++col;
-				}
-			}
-			++row;
-		}
-		
-		// set left, right, up, down links
-		for(int r = 0; r < nodeSmatrix.length; ++r) {
-			for(int c = 0; c < nodeSmatrix[r].length; ++c) {
-				if(nodeSmatrix[r][c] == null) continue;
-				
-				//System.out.println("Considering: " + nodeSmatrix[r][c]);
-				int tempr, tempc;
-				
-				//set left, which is downward in our table
-				tempr = r;
-				do {
-					tempr = (tempr + 1) % nodeSmatrix.length;
-				} while(nodeSmatrix[tempr][c] == null);
-				nodeSmatrix[r][c].left = nodeSmatrix[tempr][c];
-				
-				// set right, which is upwards in our table
-				tempr = r;
-				do {
-					--tempr;
-					if(tempr < 0) tempr = nodeSmatrix.length-1;
-				} while(nodeSmatrix[tempr][c] == null);
-				nodeSmatrix[r][c].right = nodeSmatrix[tempr][c];
-				
-				// set up, which is leftwards in our table
-				tempc = c;
-				do {
-					--tempc;
-					if(tempc < 0) tempc = nodeSmatrix[r].length-1;
-				} while(nodeSmatrix[r][tempc] == null);
-				nodeSmatrix[r][c].up = nodeSmatrix[r][tempc];
-				
-				// set down, which is rightwards in our table
-				tempc = c;
-				do {
-					tempc = (tempc + 1) % nodeSmatrix[r].length;
-				} while(nodeSmatrix[r][tempc] == null);
-				nodeSmatrix[r][c].down = nodeSmatrix[r][tempc];
-			}
-		}
-		
-		return nodeSmatrix[0][0];
+		SudokuSolver ss = new SudokuSolver(initial);
+		ss.findSolution();
 	}
 
 	public static Node test1() {
