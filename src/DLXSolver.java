@@ -1,59 +1,46 @@
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 
-public class DLX {
-	private final Node root;
-	private Map<Integer, Node>  path;
+public class DLXSolver {
+	protected Node root;
+	protected Map<Integer, Node>  path;
 	
-	public DLX(Node root) {
+	public DLXSolver() {
+		root = null;
+		path = new HashMap<Integer, Node>();
+	}
+
+	public DLXSolver(Node root) {
 		this.root = root;
 		path = new HashMap<Integer, Node>();
 	}
-	
-	public void solveSudoku(Set<String> initial) {
-		Node r = root.right;
-		while(r != root) {
-			if(initial.contains(r.getName())) {
-				coverColumn(r);
-			}
-			r = r.right;
-		}
-		findSolution();
-	}
-	
+
 	public void findSolution() {
 		search(0);
 		System.out.println("Ending search");
 	}
-	
+
 	private void search(int k) {
 		if(root.right == root) {
 			printSolution(k);
 			return;
 		}
-		
+
 		Node c = chooseColumn();
-		System.out.println("Covering: " + c);
 		coverColumn(c);
-		Node d = c.down;
-		while(d != c) {
+		for(Node d = c.down; d != c; d = d.down) {
 			path.put(k, d);
-			Node r = d.right;
-			while(r != d) {
+			
+			for(Node r = d.right; r != d; r = r.right) 
 				coverColumn(r.getColumnHeader());
-				r = r.right;
-			}
+
 			search(k+1);
 			d = path.get(k);
 			c = d.getColumnHeader();
-			Node l = d.left;
-			while(l != d) {
+			
+			for(Node l = d.left; l != d; l = l.left) 
 				uncoverColumn(l.getColumnHeader());
-				l = l.left;
-			}
-			d = d.down;
 		}
 		uncoverColumn(c);
 	}
@@ -75,20 +62,16 @@ public class DLX {
 			d = d.down;
 		}
 	}
-	
+
 	private void uncoverColumn(Node n) {
 		assert(n.getColumnHeader() == null);
-		Node u = n.up;
-		
-		while(u != n) {
-			Node l = u.left;
-			while(l != u) {
+
+		for(Node u = n.up; u != n; u = u.up) {
+			for(Node l = u.left; l != u; l = l.left) {
 				l.getColumnHeader().size++;
 				l.up.down = l;
 				l.down.up = l;
-				l = l.left;
 			}
-			u = u.up;
 		}
 		n.left.right = n;
 		n.right.left = n;
@@ -96,15 +79,13 @@ public class DLX {
 
 	private Node chooseColumn() {
 		int currSize = Integer.MAX_VALUE;
-		Node ret     = null;
+		Node ret = null;
 
-		Node currNode = root.right;
-		while(currNode != root) {
+		for(Node currNode = root.right; currNode != root; currNode = currNode.right) {
 			if(currNode.size < currSize) {
 				currSize = currNode.size;
 				ret = currNode;
-			}
-			currNode = currNode.right;
+			} 
 		}
 
 		return ret;
