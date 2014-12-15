@@ -1,205 +1,142 @@
-import java.util.HashSet;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 
 
-
-public class ExactCover {
-
-	public static void main(String[] args) {
-		//DLX dlx = new DLX(test1());
-		//dlx.findSolution();
-		
-		Set<String> initial = new HashSet<String>();
-		initial.add("r1c2#7");
-		initial.add("r1c3#5");
-		initial.add("r1c5#9");
-		initial.add("r1c9#6");
-		
-		initial.add("r2c2#2");
-		initial.add("r2c3#3");
-		initial.add("r2c5#8");
-		initial.add("r2c8#4");
-		
-		initial.add("r3c1#8");
-		initial.add("r3c6#3");
-		initial.add("r3c9#1");
-		
-		initial.add("r4c1#5");
-		initial.add("r4c4#7");
-		initial.add("r4c6#2");
-		
-		initial.add("r5c2#4");
-		initial.add("r5c4#8");
-		initial.add("r5c6#6");
-		initial.add("r5c8#2");
-		
-		initial.add("r6c4#9");
-		initial.add("r6c6#1");
-		initial.add("r6c9#3");
-		
-		initial.add("r7c1#9");
-		initial.add("r7c4#4");
-		initial.add("r7c9#7");
-		
-		initial.add("r8c2#6");
-		initial.add("r8c5#7");
-		initial.add("r8c7#5");
-		initial.add("r8c8#8");
-		
-		initial.add("r9c1#7");
-		initial.add("r9c5#1");
-		initial.add("r9c7#3");
-		initial.add("r9c8#9");
-		SudokuSolver ss = new SudokuSolver(initial);
-		ss.findSolution();
+public class ExactCover extends DLXSolver {
+	private final Set<String> initial;
+    private final int size;   // for 9 X 9 matrix size is 3 (box size)
+	
+	public ExactCover(Set<String> initial, int size) {
+		this.initial = initial;
+        this.size = size;
+        Map<String, Node> rowtag2node = init();
+		// account for initial entries by covering all columns whose constraints they satisfy
+		for(String s : initial) {
+			Node n = rowtag2node.get(s);
+			coverColumn(n.getColumnHeader());
+			for(Node r = n.right; r != n; r = r.right) {
+				coverColumn(r.getColumnHeader());
+			}
+		}
 	}
 
-	public static Node test1() {
-		Node root = new Node("Root", -1, null);
+    private Map<String, Node> init() {
+        int grid = size * size;
+        int rows = grid * grid * grid ;  // in addition we need  one row for header
+        int cols = grid * grid * 4 ;
 
-		Node a = new Node("A", 2, null);
-		Node b = new Node("B", 2, null);
-		Node c = new Node("C", 2, null);
-		Node d = new Node("D", 3, null);
-		Node e = new Node("E", 2, null);
-		Node f = new Node("F", 2, null);
-		Node g = new Node("G", 3, null);
+        Node[][] nodeSmatrix = new Node[rows+1][cols];
+        Map<String, Node> rowtag2node = new HashMap<String, Node>();
 
-		Node a1 = new Node("A1", -1, a);
-		Node a2 = new Node("A2", -1, a);
-		Node b1 = new Node("B1", -1, b);
-		Node b2 = new Node("B2", -1, b);
-		Node c1 = new Node("C1", -1, c);
-		Node c2 = new Node("C2", -1, c);
-		Node d1 = new Node("D1", -1, d);
-		Node d2 = new Node("D2", -1, d);
-		Node d3 = new Node("D3", -1, d);
-		Node e1 = new Node("E1", -1, e);
-		Node e2 = new Node("E2", -1, e);
-		Node f1 = new Node("F1", -1, f);
-		Node f2 = new Node("F2", -1, f);
-		Node g1 = new Node("G1", -1, g);
-		Node g2 = new Node("G2", -1, g);
-		Node g3 = new Node("G3", -1, g);
+        // initialize header nodes in nodeSmatrix
+        for(int c = 0; c < nodeSmatrix[0].length; ++c) {
+            nodeSmatrix[0][c] = new Node("C" + c, 4, null);
+        }
 
-		root.right = a;
-		root.left = g;
 
-		a.up = a2;
-		a.down = a1;
-		a.left = root;
-		a.right = b;
+        Scanner sc = null;
+        try {
+            sc = new Scanner(new File("sudoku_matrix"));
+            // initialize data nodes in nodeSmatrix from file
+            int row = 1;
+            while(sc.hasNext()) {
+                String[] line = sc.nextLine().split(" ");
+                if(line[0].startsWith("#"))
+                    continue;
 
-		b.up = b2;
-		b.down = b1;
-		b.left = a;
-		b.right = c;
+                String tag = line[0];
+                String bits = line[1];
 
-		c.up = c2;
-		c.down = c1;
-		c.left = b;
-		c.right = d;
+                int col = 0;
+                for(char c : bits.toCharArray()) {
+                    if(c == '1') {
+                        nodeSmatrix[row][col] = new Node(tag, -1, nodeSmatrix[0][col]);
+                    // store first node in each row so we can remove the initial positions later
+                        if(rowtag2node.get(tag) == null)
+                            rowtag2node.put(tag, nodeSmatrix[row][col]);
+                    }
+                    ++col;
+                }
+                ++row;
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
-		d.up = d3;
-		d.down = d1;
-		d.left = c;
-		d.right = e;
+        // initialize root
+        Node root = new Node("root", -1, null);
 
-		e.up = e2;
-		e.down = e1;
-		e.left = d;
-		e.right = f;
+        // set left, right, up, down links
+        for(int r = 0; r < nodeSmatrix.length; ++r) {
+            for(int c = 0; c < nodeSmatrix[r].length; ++c) {
+                if(nodeSmatrix[r][c] == null) continue;
 
-		f.up = f2;
-		f.down = f1;
-		f.left = e;
-		f.right = g;
+                //System.out.println("Considering: " + nodeSmatrix[r][c]);
+                int tempr, tempc;
 
-		g.up = g3;
-		g.down = g1;
-		g.left = f;
-		g.right = root;
+                //set left
+                tempc = c;
+                do {
+                    --tempc;
+                    if(tempc < 0) tempc = nodeSmatrix[r].length-1;
+                } while(nodeSmatrix[r][tempc] == null);
+                nodeSmatrix[r][c].left = nodeSmatrix[r][tempc];
 
-		a1.up = a;
-		a1.down = a2;
-		a1.left = g1;
-		a1.right = d1;
+                // set right
+                tempc = c;
+                do {
+                    tempc = (tempc + 1) % nodeSmatrix[r].length;
+                } while(nodeSmatrix[r][tempc] == null);
+                nodeSmatrix[r][c].right = nodeSmatrix[r][tempc];
 
-		a2.up = a1;
-		a2.down = a;
-		a2.left = d2;
-		a2.right = d2;
+                // set up
+                tempr = r;
+                do {
+                    tempr = (tempr + 1) % nodeSmatrix.length;
+                } while(nodeSmatrix[tempr][c] == null);
+                nodeSmatrix[r][c].up = nodeSmatrix[tempr][c];
 
-		b1.up = b;
-		b1.down = b2;
-		b1.left = f2;
-		b1.right = c2;
+                // set down
+                tempr = r;
+                do {
+                    --tempr;
+                    if(tempr < 0) tempr = nodeSmatrix.length-1;
+                } while(nodeSmatrix[tempr][c] == null);
+                nodeSmatrix[r][c].down = nodeSmatrix[tempr][c];
+            }
+        }
 
-		b2.up = b1;
-		b2.down = b;
-		b2.left = g2;
-		b2.right = g2;
+        // tie root into the node network
+        root.right = nodeSmatrix[0][0];
+        root.left  = nodeSmatrix[0][nodeSmatrix[0].length-1];
+        nodeSmatrix[0][0].left = root;
+        nodeSmatrix[0][nodeSmatrix[0].length-1].right = root;
 
-		c1.up = c;
-		c1.down = c2;
-		c1.left = f1;
-		c1.right = e1;
+        this.root = root;
+        return rowtag2node;
+    }
 
-		c2.up = c1;
-		c2.down = c;
-		c2.left = b1;
-		c2.right = f2;
-
-		d1.up = d;
-		d1.down = d2;
-		d1.left = a1;
-		d1.right = g1;
-
-		d2.up = d1;
-		d2.down = d3;
-		d2.left = a2;
-		d2.right = a2;
-
-		d3.up = d2;
-		d3.down = d;
-		d3.left = g3;
-		d3.right = e2;
-
-		e1.up = e;
-		e1.down = e2;
-		e1.left = c1;
-		e1.right = f1;
-
-		e2.up = e1;
-		e2.down = e;
-		e2.left = d3;
-		e2.right = g3;
-
-		f1.up = f;
-		f1.down = f2;
-		f1.left = e1;
-		f1.right = c1;
-
-		f2.up = f1;
-		f2.down = f;
-		f2.left = c2;
-		f2.right = b1;
-
-		g1.up = g;
-		g1.down = g2;
-		g1.left = d1;
-		g1.right = a1;
-
-		g2.up = g1;
-		g2.down = g3;
-		g2.left = b2;
-		g2.right = b2;
-
-		g3.up = g2;
-		g3.down = g;
-		g3.left = e2;
-		g3.right = d3;
-
-		return root;
+    protected void printSolution(int k) {
+		int[][] solution = new int[9][9];
+		System.out.println("Solution:: ");
+		for(int i = 0; i < k; i++) {
+			String name = path.get(i).getName();
+			// names are in r_c_#_ format
+			solution[name.charAt(1)-'0'-1][name.charAt(3)-'0'-1] = name.charAt(5)-'0';
+		}
+		for(String s : initial)
+			solution[s.charAt(1)-'0'-1][s.charAt(3)-'0'-1] = s.charAt(5)-'0';
+		
+		for(int r = 0; r < solution.length; ++r) {
+			System.out.print("|");
+			for(int c = 0; c < solution[r].length; ++c) {
+				System.out.print(solution[r][c] + "|");
+			}
+			System.out.println();
+		}
 	}
 }
