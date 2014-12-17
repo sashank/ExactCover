@@ -37,21 +37,47 @@ public class ExactCover extends DLXSolver {
         for (int c = 0; c < nodeSmatrix[0].length; ++c) {
             nodeSmatrix[0][c] = new Node("C" + c, 4, null);
         }
-      /*  // Outer three loops are Rows of the Exact Cover Matrix
-        for(int su_row = 1 ; su_row <= grid; su_row ++){
-            for(int su_col = 1 ; su_col <= grid; su_col ++) {
-                for (int su_val=1; su_val <= grid; su_val++){
+
+        int ec_cnt = 0;
+        ArrayList<String> exactcover_tagList = new ArrayList<String>(rows);
+        // Outer three loops are Rows of the Exact Cover Matrix
+        for(int su_row = 0 ; su_row < grid; su_row ++){
+           for(int su_col = 0 ; su_col < grid; su_col ++) {
+                for (int su_val = 0; su_val < grid ; su_val++){
+                   // int r = 0, c = 0, val = 0;
+                   // Cell Constraint 0 - 80 cols, Row Constraint 81 - 161, Col Constraint 162- 243 Cols, Box Constraint 244 - 323 Cols
                     // Inner loops are Cols of the Exact Cover Matrix
                     Boolean[] array = new Boolean[cols];
                     Arrays.fill(array, Boolean.FALSE);
 
-                    array[su_row] = Boolean.TRUE;
-                    array[su_col] = Boolean.TRUE;
-                    array[su_val] = Boolean.TRUE;
+                    array[((su_row * grid ) + su_col)] = Boolean.TRUE;
 
+                    int constraint_indx = 0;
+                 //   array[su_val-1] = Boolean.TRUE;
+                //    constraint_indx = constraint_indx + (grid * grid);
+                 //   array[su_row+constraint_indx-1] = Boolean.TRUE;
+                    constraint_indx = constraint_indx + (grid * grid);
+                    array[su_col+constraint_indx-1] = Boolean.TRUE;
+                  //  constraint_indx = constraint_indx + (grid * grid);
+
+                    int box = su_row % size;
+                    box = box + su_row % size;
+                   // array[box + constraint_indx-1] = Boolean.TRUE;
+                    System.out.print("r"+(su_row+1)+"c"+(su_col+1)+"#"+(su_val+1) +" : ");
+                    for(int j=0 ; j <cols; j++) {
+                      if(array[j] == Boolean.TRUE)
+                          System.out.print(1);
+                      else
+                          System.out.print(0);
+                    }
+                  //  if(ec_cnt >1)
+                    //    System.exit(0);
+
+                    System.out.println();
+                    ec_cnt++;
                 }
-            }
-        }
+             }
+         }
 
         for (int row = 1 ; row < rows; row++){
             int i = 1, j = 1, k=1 ;
@@ -59,7 +85,7 @@ public class ExactCover extends DLXSolver {
             Arrays.fill(array, Boolean.FALSE);
 
 
-        }    */
+        }
         Scanner sc = null;
         try {
             sc = new Scanner(new File("sudoku_matrix"));
