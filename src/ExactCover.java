@@ -1,18 +1,19 @@
+import com.sun.org.apache.xpath.internal.operations.Bool;
+
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 
 public class ExactCover extends DLXSolver {
 	private final Set<String> initial;
-    private final int size;   // for 9 X 9 matrix size is 3 (box size)
+    private final int size;   // for 9 X 9 grid, size is 3 (box size)
+    private final int constraints;
 	
-	public ExactCover(Set<String> initial, int size) {
+	public ExactCover(Set<String> initial, int size, int constraints) {
 		this.initial = initial;
         this.size = size;
+        this.constraints = constraints;
         Map<String, Node> rowtag2node = init();
 		// account for initial entries by covering all columns whose constraints they satisfy
 		for(String s : initial) {
@@ -25,19 +26,40 @@ public class ExactCover extends DLXSolver {
 	}
 
     private Map<String, Node> init() {
-        int grid = size * size;
-        int rows = grid * grid * grid ;  // in addition we need  one row for header
-        int cols = grid * grid * 4 ;
+        int grid = size * size; // for 9 X 9 grid, size is 3 (box size)
+        int rows = grid * grid * grid;
+        int cols = grid * grid * constraints;
 
-        Node[][] nodeSmatrix = new Node[rows+1][cols];
+        Node[][] nodeSmatrix = new Node[rows + 1][cols];  // we need additional row for header
         Map<String, Node> rowtag2node = new HashMap<String, Node>();
 
         // initialize header nodes in nodeSmatrix
-        for(int c = 0; c < nodeSmatrix[0].length; ++c) {
+        for (int c = 0; c < nodeSmatrix[0].length; ++c) {
             nodeSmatrix[0][c] = new Node("C" + c, 4, null);
         }
+      /*  // Outer three loops are Rows of the Exact Cover Matrix
+        for(int su_row = 1 ; su_row <= grid; su_row ++){
+            for(int su_col = 1 ; su_col <= grid; su_col ++) {
+                for (int su_val=1; su_val <= grid; su_val++){
+                    // Inner loops are Cols of the Exact Cover Matrix
+                    Boolean[] array = new Boolean[cols];
+                    Arrays.fill(array, Boolean.FALSE);
+
+                    array[su_row] = Boolean.TRUE;
+                    array[su_col] = Boolean.TRUE;
+                    array[su_val] = Boolean.TRUE;
+
+                }
+            }
+        }
+
+        for (int row = 1 ; row < rows; row++){
+            int i = 1, j = 1, k=1 ;
+            Boolean[] array = new Boolean[cols];
+            Arrays.fill(array, Boolean.FALSE);
 
 
+        }    */
         Scanner sc = null;
         try {
             sc = new Scanner(new File("sudoku_matrix"));
