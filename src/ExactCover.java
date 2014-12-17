@@ -49,13 +49,13 @@ public class ExactCover extends DLXSolver {
                     // Inner loops are Cols of the Exact Cover Matrix
                     Boolean[] array = new Boolean[cols];
                     Arrays.fill(array, Boolean.FALSE);
-
-                    array[((su_row * grid ) + su_col)] = Boolean.TRUE;
-
                     int constraint_indx = 0;
-                 //   array[su_val-1] = Boolean.TRUE;
-                //    constraint_indx = constraint_indx + (grid * grid);
-                 //   array[su_row+constraint_indx-1] = Boolean.TRUE;
+
+                    array[constraint_indx + ((su_row * grid ) + su_col)] = Boolean.TRUE;
+
+                    constraint_indx = constraint_indx + (grid * grid) -1;
+                    array[constraint_indx + ((su_row * grid ) + su_val)] = Boolean.TRUE;
+
                     constraint_indx = constraint_indx + (grid * grid);
                     array[su_col+constraint_indx-1] = Boolean.TRUE;
                   //  constraint_indx = constraint_indx + (grid * grid);
