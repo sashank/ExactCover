@@ -38,31 +38,53 @@ public class ExactCover extends DLXSolver {
             nodeSmatrix[0][c] = new Node("C" + c, 4, null);
         }
 
-        int ec_cnt = 0;
+        int ec_cnt = 0, box_no = 1, box_r = 0, box_c =0;
         ArrayList<String> exactcover_tagList = new ArrayList<String>(rows);
         // Outer three loops are Rows of the Exact Cover Matrix
         for(int su_row = 0 ; su_row < grid; su_row ++){
            for(int su_col = 0 ; su_col < grid; su_col ++) {
                 for (int su_val = 0; su_val < grid ; su_val++){
-                   // int r = 0, c = 0, val = 0;
-                   // Cell Constraint 0 - 80 cols, Row Constraint 81 - 161, Col Constraint 162- 243 Cols, Box Constraint 244 - 323 Cols
-                    // Inner loops are Cols of the Exact Cover Matrix
+
+
                     Boolean[] array = new Boolean[cols];
                     Arrays.fill(array, Boolean.FALSE);
                     int constraint_indx = 0;
 
+                    // Cell Constraint 0 - 80 cols,
                     array[constraint_indx + ((su_row * grid ) + su_col)] = Boolean.TRUE;
 
+                    // Row Constraint 81 - 161 Cols
                     constraint_indx = constraint_indx + (grid * grid) -1;
                     array[constraint_indx + ((su_row * grid ) + su_val)] = Boolean.TRUE;
 
-                    constraint_indx = constraint_indx + (grid * grid);
-                    array[su_col+constraint_indx-1] = Boolean.TRUE;
-                  //  constraint_indx = constraint_indx + (grid * grid);
+                    // Col Constraint 162- 243 Cols
+                    constraint_indx = constraint_indx + (grid * grid) -1;
+                    array[constraint_indx + ((su_col * grid ) + su_val)] = Boolean.TRUE;
 
-                    int box = su_row % size;
-                    box = box + su_row % size;
-                   // array[box + constraint_indx-1] = Boolean.TRUE;
+                    //  Box Constraint 244 - 323 Cols
+                    constraint_indx = constraint_indx + (grid * grid) -1;
+
+                    if( (su_row >=0 && su_row < 3) && (su_col >=0 && su_col < 3 ))
+                        box_no = 0;
+                    if( (su_row >=0 && su_row < 3) && (su_col >=4 && su_col < 6 ))
+                        box_no = 1;
+                    if( (su_row >=0 && su_row < 3) && (su_col >=7 && su_col < 9 ))
+                        box_no = 2;
+                    if( (su_row >=4 && su_row < 6) && (su_col >=0 && su_col < 3 ))
+                        box_no = 3;
+                    if( (su_row >=4 && su_row < 6) && (su_col >=4 && su_col < 6 ))
+                        box_no = 4;
+                    if( (su_row >=4 && su_row < 6) && (su_col >=7 && su_col < 9 ))
+                        box_no = 5;
+                    if( (su_row >=7 && su_row < 9) && (su_col >=0 && su_col < 3 ))
+                        box_no = 6;
+                    if( (su_row >=7 && su_row < 9) && (su_col >=4 && su_col < 6 ))
+                        box_no = 7;
+                    if( (su_row >=7 && su_row < 9) && (su_col >=7 && su_col < 9 ))
+                        box_no = 8;
+
+                    array[constraint_indx + (box_no * grid) + su_val] = Boolean.TRUE;
+
                     System.out.print("r"+(su_row+1)+"c"+(su_col+1)+"#"+(su_val+1) +" : ");
                     for(int j=0 ; j <cols; j++) {
                       if(array[j] == Boolean.TRUE)
@@ -70,8 +92,6 @@ public class ExactCover extends DLXSolver {
                       else
                           System.out.print(0);
                     }
-                  //  if(ec_cnt >1)
-                    //    System.exit(0);
 
                     System.out.println();
                     ec_cnt++;
@@ -79,13 +99,6 @@ public class ExactCover extends DLXSolver {
              }
          }
 
-        for (int row = 1 ; row < rows; row++){
-            int i = 1, j = 1, k=1 ;
-            Boolean[] array = new Boolean[cols];
-            Arrays.fill(array, Boolean.FALSE);
-
-
-        }
         Scanner sc = null;
         try {
             sc = new Scanner(new File("sudoku_matrix"));
