@@ -93,13 +93,10 @@ public class ExactCover extends DLXSolver {
                     }
                     value = builder.toString();
                     exactCoverMatrix.put(key,value) ;
-                  //  System.out.println((constraint_indx + (box_no * grid) + su_val ) + " box " + box_no + "key " +key);
-                  //  System.out.println(key +" "+ value);
                     ec_cnt++;
                 }
              }
          }
-
 
         int row = 1;
          for(String tag : exactCoverMatrix.keySet()){
